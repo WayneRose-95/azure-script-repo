@@ -19,7 +19,7 @@ class AzureSQLDatabaseConnector:
         self.username = username # replace with your Azure SQL Database username
         self.password = password # replace with your Azure SQL Database password
         self.driver = '{ODBC Driver 18 for SQL Server}'
-        pass 
+         
 
     def create_connection_string(self):
         # Create the connection string
