@@ -47,7 +47,7 @@ class AzureSQLDatabaseConnector:
 
         # Once loaded, can populate attributes with the fields 
         pass 
-    def create_connection_string(self):
+    def create_connection_string(self, credentials_file : dict):
         #TODO: Add an extra parameter: database_engine which accepts the following engines 
 
         '''
@@ -59,19 +59,25 @@ class AzureSQLDatabaseConnector:
         
         all database engines aside from mssql have different ways to create their connection strings 
         '''
-        # Create the connection string
-        connection_string = f'Driver={self.driver};\
-            Server=tcp:{self.server},1433;\
-            Database={self.database};\
-            Uid={self.username};\
-            Pwd={self.password};\
-            Encrypt=yes;\
-            TrustServerCertificate=no;\
-            Connection Timeout=30;'
-        
-        return connection_string
+        # If the database_engine in the configuration file is mssql
+        if credentials_file['dict'] == 'mssql':
+            # Create the connection string
+            connection_string = f'Driver={self.driver};\
+                Server=tcp:{self.server},1433;\
+                Database={self.database};\
+                Uid={self.username};\
+                Pwd={self.password};\
+                Encrypt=yes;\
+                TrustServerCertificate=no;\
+                Connection Timeout=30;'
+            
+            return connection_string
+        # For all other database engines, these connection strings are the same format which can be used in sqlalchemy.create_engine
+        else:
+            connection_string = f'{credentials_file['database_type']}+{credentials_file['dbapi']}://{self.username}:{self.password}@{self.server}/{self.database}'
+            return connection_string
 
-    def initalise_database_engine(self, connection_string : str):
+    def initalise_database_engine(self, connection_string : str, database_engine : str):
         #TODO: Add an extra parameter: database_engine which accepts the following engines 
 
         '''
@@ -83,9 +89,13 @@ class AzureSQLDatabaseConnector:
         
         all database engines aside from mssql have different ways to create their connection strings 
         '''
-        # Create the engine to connect to the database
-        engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(connection_string))
-        return engine 
+        if database_engine == 'mssql':
+            # Create the engine to connect to the database
+            engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(connection_string))
+            return engine 
+        else:
+            engine = create_engine(connection_string)
+            return engine 
         
 
     def test_connection(self, engine : Engine):
