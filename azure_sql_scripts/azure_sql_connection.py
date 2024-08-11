@@ -28,22 +28,12 @@ class AzureSQLDatabaseConnector:
             with open(file_name) as file:
                 credentials_file = load(file)
             
-            # Reassign each attribute of the class whose entry is None to the values at these keys 
-            self.server = credentials_file['server_name']
-            self.database = credentials_file['database']
-            self.username = credentials_file['username']
-            self.password = credentials_file['password']
             return credentials_file
 
         elif file_type == 'yaml':
             with open(file_name) as file:
                 credentials_file = safe_load(file)
         
-            # Reassign each attribute of the class whose entry is None to the values at these keys 
-            self.server = credentials_file['server_name']
-            self.database = credentials_file['database']
-            self.username = credentials_file['username']
-            self.password = credentials_file['password']
             return credentials_file
         # credentials file can support either yaml or json 
 
@@ -63,6 +53,11 @@ class AzureSQLDatabaseConnector:
         '''
         # If the database_engine in the configuration file is mssql
         if credentials_file['database_type'] == 'mssql':
+            # Reassign each attribute of the class whose entry is None to the values at these keys 
+            self.server = credentials_file['server_name']
+            self.database = credentials_file['database']
+            self.username = credentials_file['username']
+            self.password = credentials_file['password']
             # Create the connection string
             connection_string = f'Driver={self.driver};\
                 Server=tcp:{self.server},1433;\
@@ -76,10 +71,14 @@ class AzureSQLDatabaseConnector:
             return connection_string
         # For all other database engines, these connection strings are the same format which can be used in sqlalchemy.create_engine
         else:
+            self.server = credentials_file['server_name']
+            self.database = credentials_file['database']
+            self.username = credentials_file['username']
+            self.password = credentials_file['password']
             connection_string = f"{credentials_file['database_type']}+{credentials_file['dbapi']}://{self.username}:{self.password}@{self.server}/{self.database}"
             return connection_string
 
-    def initalise_database_engine(self, connection_string : str, database_engine : str):
+    def initalise_database_engine(self, connection_string : str, database_engine : str = None):
         #TODO: Add an extra parameter: database_engine which accepts the following engines 
 
         '''
