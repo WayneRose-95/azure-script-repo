@@ -33,6 +33,7 @@ class AzureSQLDatabaseConnector:
             self.database = credentials_file['database']
             self.username = credentials_file['username']
             self.password = credentials_file['password']
+            return credentials_file
 
         elif file_type == 'yaml':
             with open(file_name) as file:
@@ -43,6 +44,7 @@ class AzureSQLDatabaseConnector:
             self.database = credentials_file['database']
             self.username = credentials_file['username']
             self.password = credentials_file['password']
+            return credentials_file
         # credentials file can support either yaml or json 
 
         # Once loaded, can populate attributes with the fields 
@@ -60,7 +62,7 @@ class AzureSQLDatabaseConnector:
         all database engines aside from mssql have different ways to create their connection strings 
         '''
         # If the database_engine in the configuration file is mssql
-        if credentials_file['dict'] == 'mssql':
+        if credentials_file['database_type'] == 'mssql':
             # Create the connection string
             connection_string = f'Driver={self.driver};\
                 Server=tcp:{self.server},1433;\
@@ -74,7 +76,7 @@ class AzureSQLDatabaseConnector:
             return connection_string
         # For all other database engines, these connection strings are the same format which can be used in sqlalchemy.create_engine
         else:
-            connection_string = f'{credentials_file['database_type']}+{credentials_file['dbapi']}://{self.username}:{self.password}@{self.server}/{self.database}'
+            connection_string = f"{credentials_file['database_type']}+{credentials_file['dbapi']}://{self.username}:{self.password}@{self.server}/{self.database}"
             return connection_string
 
     def initalise_database_engine(self, connection_string : str, database_engine : str):
