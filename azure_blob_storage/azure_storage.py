@@ -34,6 +34,22 @@ class AzureBlobStorageConnector:
         print(f"Retrieving {blob_name} from {container_name}")
         return blob_client 
     
+    def list_blobs_in_container(self, blob_service_client : BlobServiceClient, container_name : str, blob_tags=False):
+        container_client = blob_service_client.get_container_client(container=container_name)
+
+        if blob_tags:
+            blob_list = container_client.list_blobs(include=['tags'])
+            for blob in blob_list:
+                print(f"Name: {blob['name']}, Tags: {blob['tags']}")
+                
+            return blob_list
+        else:
+            blob_list = container_client.list_blobs()
+            for blob in blob_list:
+                print(f"Name: {blob.name}")
+            return blob_list 
+
+
     def retrieve_data_from_blob(
             self, 
             blob_client : BlobClient,
