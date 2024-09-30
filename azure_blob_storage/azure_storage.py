@@ -1,5 +1,6 @@
 from azure.storage.blob import BlobServiceClient
 from azure.storage.blob import BlobClient
+from azure.storage.blob import ContainerClient
 
 class AzureBlobStorageConnector:
     
@@ -21,6 +22,10 @@ class AzureBlobStorageConnector:
     def create_blob_service_client(self, connection_string : str): 
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         return blob_service_client 
+    
+    def create_container_client(connection_string : str, container_name : str):
+        container_client = ContainerClient.from_connection_string(connection_string, container_name)
+        return container_client, container_name 
 
     def retrieve_blob_client(
             self, 
