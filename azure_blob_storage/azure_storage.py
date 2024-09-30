@@ -26,10 +26,11 @@ class AzureBlobStorageConnector:
         return blob_service_client 
     
     def create_container_client(self, connection_string : str, container_name : str):
+        
         container_client = ContainerClient.from_connection_string(connection_string, container_name)
         return container_client, container_name 
     
-    def create_blob_container(container_client : ContainerClient, container_name : str): 
+    def create_blob_container(self, container_client : ContainerClient, container_name : str): 
 
         try: 
             container_client.create_container() 
@@ -42,6 +43,16 @@ class AzureBlobStorageConnector:
         except ResourceExistsError:
             print(f'Container {container_name }already exists')
             raise ResourceExistsError
+        
+    def retrieve_container_properties(container_client : ContainerClient):
+
+        try:
+            container_properties = container_client.get_container_properties() 
+            return container_properties 
+        
+        except ResourceNotFoundError:
+            print('Resource not found.')
+            raise ResourceNotFoundError
 
     def retrieve_blob_client(
             self, 
