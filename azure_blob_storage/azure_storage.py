@@ -26,7 +26,7 @@ class AzureBlobStorageConnector:
         return blob_service_client 
     
     def create_container_client(self, connection_string : str, container_name : str):
-        
+
         container_client = ContainerClient.from_connection_string(connection_string, container_name)
         return container_client, container_name 
     
@@ -81,6 +81,9 @@ class AzureBlobStorageConnector:
                 print(f"Name: {blob.name}")
             return blob_list 
 
+    def upload_blob(container_client : ContainerClient, blob_name : str, blob_data):
+
+        container_client.upload_blob(blob_name, blob_data)
 
     def retrieve_data_from_blob(
             self, 
