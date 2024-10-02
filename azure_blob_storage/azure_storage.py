@@ -1,5 +1,8 @@
 from azure.storage.blob import BlobServiceClient
 from azure.storage.blob import BlobClient
+from azure.storage.blob import ContainerClient
+from azure.core.exceptions import ResourceExistsError
+from azure.core.exceptions import ResourceNotFoundError
 
 class AzureBlobStorageConnector:
     
@@ -21,6 +24,35 @@ class AzureBlobStorageConnector:
     def create_blob_service_client(self, connection_string : str): 
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         return blob_service_client 
+    
+    def create_container_client(self, connection_string : str, container_name : str):
+
+        container_client = ContainerClient.from_connection_string(connection_string, container_name)
+        return container_client, container_name 
+    
+    def create_blob_container(self, container_client : ContainerClient, container_name : str): 
+
+        try: 
+            container_client.create_container() 
+            print(f"Container {container_name} created")
+
+        except ResourceNotFoundError:
+            print(f'Container {container_name} not found.')
+            raise ResourceNotFoundError 
+    
+        except ResourceExistsError:
+            print(f'Container {container_name }already exists')
+            raise ResourceExistsError
+        
+    def retrieve_container_properties(container_client : ContainerClient):
+
+        try:
+            container_properties = container_client.get_container_properties() 
+            return container_properties 
+        
+        except ResourceNotFoundError:
+            print('Resource not found.')
+            raise ResourceNotFoundError
 
     def retrieve_blob_client(
             self, 
@@ -49,6 +81,9 @@ class AzureBlobStorageConnector:
                 print(f"Name: {blob.name}")
             return blob_list 
 
+    def upload_blob(container_client : ContainerClient, blob_name : str, blob_data):
+
+        container_client.upload_blob(blob_name, blob_data)
 
     def retrieve_data_from_blob(
             self, 
